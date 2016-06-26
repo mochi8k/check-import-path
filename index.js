@@ -1,14 +1,11 @@
 const path = require('path');
 const fs = require('fs');
 
-const stringsToken = /import\s*\w+\s*from\s'\.[\w\/_]+'/g
-const stringToken = /import\s*\w+\s*from\s'(\.[\w\/_]+)'/
-
 const filePath = path.resolve(__dirname, process.argv[2]);
-const formString = fs.readFileSync(filePath, 'utf8');
+const text = fs.readFileSync(filePath, 'utf8');
 
 // 各クラスのimport文を配列で取得.
-const importStrings = formString.match(stringsToken);
+const importStrings = text.match(/import\s*\w+\s*from\s'\.[\w\/_]+'/g);
 
 const isSuccess = importStrings.every((importString) => {
     return isValidPath(filePath, importString);
@@ -20,11 +17,12 @@ if (isSuccess) {
 
 
 function isValidPath(rootPath, importString) {
-    // path部分をキャプチャリング.
-    const matches = importString.match(stringToken);
+
+    // pathをキャプチャリング
+    const matches = importString.match(/import\s*\w+\s*from\s'(\.[\w\/_]+)'/);
 
     if (matches == null) {
-        console.log('Regular expression not appropriate.', importString);
+        console.log(`Regular expression not appropriate., ${importString}`);
         return false
     }
 
